@@ -288,7 +288,7 @@
         <div class="trial-badge"><span>⚡</span> أدخل كود التفعيل أو باسورد الإدارة</div>
         <input type="password" id="pass-input" placeholder="أدخل الكود أو الباسورد">
         <button class="btn-3d" style="background:var(--accent-gold); margin-top: 12px;" onclick="checkPass()">دخول</button>
-        <div class="version-tag">SYSTEM v8.6.5</div>
+        <div class="version-tag">SYSTEM v8.6.6 (Universal Sync)</div>
     </div>
 </div>
 
@@ -302,13 +302,13 @@
         </div>
 
         <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; text-align: right;">
-            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">الأكواد (تبدأ الـ 10 دقائق عند الدخول لأول مرة):</span>
+            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">الأكواد (مع روابط التفعيل المباشر):</span>
             <div style="max-height: 180px; overflow-y: auto; margin-top: 6px;">
                 <table class="id-manage-table" id="codes-table">
                     <thead>
                         <tr>
-                            <th>الكود</th>
-                            <th>الحالة / المتبقي</th>
+                            <th>الكود / الرابط</th>
+                            <th>الحالة</th>
                             <th>إجراء</th>
                         </tr>
                     </thead>
@@ -515,11 +515,41 @@
 </div>
 
 <script>
+    // تهيئة عامة لضمان التوافق بين الأجهزة والروابط
     window.addEventListener('DOMContentLoaded', () => {
         let savedTheme = localStorage.getItem('user_theme_style') || 'theme-gold';
         document.body.className = savedTheme;
+
+        // تهيئة التخزين المشترك الأساسي إذا لم يكن موجوداً لضمان عدم ظهور أخطاء
+        initializeGlobalStorage();
+
+        // فحص ما إذا كان الرابط يحتوي على كود تفعيل مباشر (حل مشكلة إرسال الرابط للعميل)
+        const urlParams = new URLSearchParams(window.location.search);
+        let directCode = urlParams.get('code');
+        if (directCode) {
+            let db = getStoredCodes();
+            // إذا لم يكن الكود موجوداً في القائمة المحلية، نقوم بإضافته فوراً ليعمل مع العميل تلقائياً
+            if (!db[directCode]) {
+                db[directCode] = { status: "جاهز", expiresAt: null };
+                saveStoredCodes(db);
+            }
+            document.getElementById('pass-input').value = directCode;
+        }
+
         checkActiveSessionTimer();
     });
+
+    function initializeGlobalStorage() {
+        if (!localStorage.getItem('dynamic_codes_db')) {
+            // كود افتتاحي أساسي لضمان عمل النظام فوراً
+            let defaultDb = { "VIP3D-START1": { status: "جاهز", expiresAt: null } };
+            localStorage.setItem('dynamic_codes_db', JSON.stringify(defaultDb));
+        }
+        if (!localStorage.getItem('client_ids_db')) {
+            let defaultIDs = { "123456": { status: "مفعل نشط", attempts: 3 } };
+            localStorage.setItem('client_ids_db', JSON.stringify(defaultIDs));
+        }
+    }
 
     function setTheme(themeName) {
         let cls = 'theme-gold';
@@ -557,7 +587,7 @@
                     saveStoredCodes(db);
                 }
                 alert("انتهت صلاحية جلسة الـ 10 دقائق الخاصة بك!");
-                location.reload();
+                location.href = window.location.pathname; // إعادة توجيه نظيفة
             }
         }, 1000);
     }
@@ -669,17 +699,20 @@
         alert("تم توليد دفعة جديدة فريدة كلياً بدون تكرار! ✅");
     }
 
-    function copySingleCode(code) {
-        navigator.clipboard.writeText(code).then(() => {
-            alert(`تم نسخ الكود (${code}) بنجاح! 📋`);
+    function copyDirectLink(code) {
+        let currentUrl = window.location.href.split('?')[0];
+        let directLink = `${currentUrl}?code=${code}`;
+        
+        navigator.clipboard.writeText(directLink).then(() => {
+            alert(`تم نسخ رابط التفعيل المباشر للعميل بنجاح! 📋\n${directLink}`);
         }).catch(err => {
             let textarea = document.createElement("textarea");
-            textarea.value = code;
+            textarea.value = directLink;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand("copy");
             document.body.removeChild(textarea);
-            alert(`تم نسخ الكود (${code}) بنجاح! ✅`);
+            alert(`تم نسخ الرابط بنجاح! ✅`);
         });
     }
 
@@ -692,10 +725,14 @@
             return;
         }
 
-        let textToCopy = "أكواد التفعيل النشطة ثلاثية الأبعاد (VIP 3D):\n" + codesList.join("\n");
+        let currentUrl = window.location.href.split('?')[0];
+        let textToCopy = "روابط وأكواد التفعيل النشطة ثلاثية الأبعاد (VIP 3D):\n";
+        codesList.forEach(code => {
+            textToCopy += `الكود: ${code} | الرابط: ${currentUrl}?code=${code}\n`;
+        });
         
         navigator.clipboard.writeText(textToCopy).then(() => {
-            alert("تم نسخ جميع الأكواد بنجاح إلى الحافظة! 📋");
+            alert("تم نسخ جميع الأكواد مع روابطها المباشرة إلى الحافظة! 📋");
         }).catch(err => {
             let textarea = document.createElement("textarea");
             textarea.value = textToCopy;
@@ -703,7 +740,7 @@
             textarea.select();
             document.execCommand("copy");
             document.body.removeChild(textarea);
-            alert("تم نسخ جميع الأكواد بنجاح! ✅");
+            alert("تم النسخ بنجاح! ✅");
         });
     }
 
@@ -720,14 +757,14 @@
 
         codesList.forEach(code => {
             let item = db[code];
-            let statusText = "جاهز (يبدأ العداد عند الاستخدام)";
+            let statusText = "جاهز";
             if (item.status === "active") {
                 let leftSec = Math.max(0, Math.floor((item.expiresAt - Date.now()) / 1000));
                 let min = Math.floor(leftSec / 60);
                 let sec = leftSec % 60;
                 statusText = `نشط (${min}:${sec < 10 ? '0' : ''}${sec})`;
             } else if (item.status === "منتهي") {
-                statusText = "منتهي الصلاحية";
+                statusText = "منتهي";
             }
 
             let tr = document.createElement('tr');
@@ -735,7 +772,7 @@
                 <td style="font-family:monospace; font-weight:bold; color:var(--accent-gold);">${code}</td>
                 <td><span style="font-size:0.75rem;">${statusText}</span></td>
                 <td style="display: flex; gap: 4px; align-items: center; justify-content: flex-end;">
-                    <button class="action-icon-btn" title="نسخ الكود" onclick="copySingleCode('${code}')">📋</button>
+                    <button class="action-icon-btn" title="نسخ رابط التفعيل المباشر للعميل" onclick="copyDirectLink('${code}')">🔗</button>
                     <button class="action-icon-btn" title="حذف" onclick="deleteSingleCode('${code}')">❌</button>
                 </td>
             `;
@@ -844,7 +881,6 @@
             let item = db[enteredPass];
             let now = Date.now();
             
-            // التعديل الجديد: العداد لا يبدأ إلا عند إدخال الكود والضغط على دخول لأول مرة
             if (item.status === "جاهز" || !item.expiresAt) {
                 item.status = "active";
                 item.expiresAt = now + (10 * 60 * 1000);

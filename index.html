@@ -288,7 +288,7 @@
         <div class="trial-badge"><span>⚡</span> أدخل كود التفعيل أو باسورد الإدارة</div>
         <input type="password" id="pass-input" placeholder="أدخل الكود أو الباسورد">
         <button class="btn-3d" style="background:var(--accent-gold); margin-top: 12px;" onclick="checkPass()">دخول</button>
-        <div class="version-tag">SYSTEM v8.6.3</div>
+        <div class="version-tag">SYSTEM v8.6.5</div>
     </div>
 </div>
 
@@ -302,7 +302,7 @@
         </div>
 
         <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; text-align: right;">
-            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">الأكواد النشطة (تستمر 10 دقائق):</span>
+            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">الأكواد النشطة (تستمر 10 دقائق من أول استخدام):</span>
             <div style="max-height: 180px; overflow-y: auto; margin-top: 6px;">
                 <table class="id-manage-table" id="codes-table">
                     <thead>
@@ -326,7 +326,17 @@
         <h2 style="color: var(--win-green); font-size: 1.15rem;">إدارة وتفعيل الـ IDs ⚙️</h2>
         <div style="margin-top: 10px; text-align: right;">
             <input type="text" id="new-id-input" placeholder="أدخل الـ ID الجديد للعميل" style="font-size: 0.85rem; padding: 10px;">
-            <button class="btn-3d" style="background: var(--win-green); color: #05070a; padding: 9px; font-size: 0.85rem; width: 100%; margin-top: 6px;" onclick="addClientCustomID()">إضافة وتفعيل الـ ID</button>
+            <div style="display: flex; gap: 8px; margin-top: 6px; align-items: center;">
+                <span style="font-size: 0.75rem; color: #aaa;">عدد المحاولات:</span>
+                <select id="new-id-attempts" style="margin: 0; padding: 6px; font-size: 0.85rem;">
+                    <option value="1">1 محاولة</option>
+                    <option value="2">2 محاولات</option>
+                    <option value="3" selected>3 محاولات</option>
+                    <option value="4">4 محاولات</option>
+                    <option value="5">5 محاولات</option>
+                </select>
+            </div>
+            <button class="btn-3d" style="background: var(--win-green); color: #05070a; padding: 9px; font-size: 0.85rem; width: 100%; margin-top: 8px;" onclick="addClientCustomID()">إضافة وتفعيل الـ ID</button>
         </div>
 
         <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; text-align: right;">
@@ -336,7 +346,8 @@
                     <thead>
                         <tr>
                             <th>الـ ID</th>
-                            <th>الحالة</th>
+                            <th>المحاولات المتبقية</th>
+                            <th>تعديل المحاولات</th>
                             <th>إجراء</th>
                         </tr>
                     </thead>
@@ -385,7 +396,10 @@
     <div class="login-box" style="max-width: 400px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
             <h2>اختر اللعبة 🎮</h2>
-            <div id="session-timer-hud" class="timer-hud">⏱️ 10:00</div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <div id="session-timer-hud" class="timer-hud">⏱️ 10:00</div>
+                <div id="attempts-hud" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
         </div>
         
         <div style="display: flex; gap: 6px; margin-bottom: 12px; background: rgba(20,28,42,0.8); padding: 8px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1);">
@@ -412,11 +426,14 @@
         <div class="header">
             <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
             <span>Apple 🍎 [3D Mode]</span>
-            <div id="game-timer-hud-apple" class="timer-hud">⏱️ 10:00</div>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-apple" class="timer-hud">⏱️ 10:00</div>
+                <div id="game-attempts-hud-apple" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
         </div>
         <div id="game-board-apple"></div>
         <div class="controls">
-            <button class="btn-3d" style="background:var(--accent-gold); color:#05070a" onclick="startGameAppleSetup()">جولة جديدة 🔄</button>
+            <button class="btn-3d" style="background:var(--accent-gold); color:#05070a" onclick="resetGameSession('apple')">إعادة تهيئة (Reset) 🔄</button>
         </div>
     </div>
 
@@ -424,14 +441,17 @@
         <div class="header">
             <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
             <span>Gems & Mines 💎</span>
-            <div id="game-timer-hud-gems" class="timer-hud">⏱️ 10:00</div>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-gems" class="timer-hud">⏱️ 10:00</div>
+                <div id="game-attempts-hud-gems" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
         </div>
         <div style="flex:1; display:flex; justify-content:center; align-items:center; padding: 10px;">
             <div class="gems-container">
                 <div style="font-size: 16px; color: var(--accent-gold); font-weight:bold;">RADAR GEMS 3D</div>
                 <div id="game-board-gems" class="royal-grid"></div>
                 <div style="font-size: 13px; color: #aaa;">اضغط على أي خانة لكشف محتواها بنظام النيون المتشابك!</div>
-                <button class="btn-3d btn-blue" style="padding: 10px;" onclick="renderGemsGridSetup()">إعادة تعيين الشبكة 🔄</button>
+                <button class="btn-3d btn-blue" style="padding: 10px;" onclick="resetGameSession('gems')">إعادة تهيئة الشبكة (Reset) 🔄</button>
             </div>
         </div>
     </div>
@@ -440,14 +460,17 @@
         <div class="header">
             <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
             <span>Royal Feast 🍗</span>
-            <div id="game-timer-hud-royal" class="timer-hud">⏱️ 10:00</div>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-royal" class="timer-hud">⏱️ 10:00</div>
+                <div id="game-attempts-hud-royal" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
         </div>
         <div style="flex:1; display:flex; justify-content:center; align-items:center; background:rgba(27,0,0,0.6); padding: 10px;">
             <div class="royal-container">
                 <div style="font-size: 16px; color: var(--accent-gold); font-weight: bold;">ROYAL FEAST RADAR 3D</div>
                 <div id="game-board-royal" class="royal-grid"></div>
                 <div style="font-size: 13px; color: #aaa;">اضغط على أي طبق لكشف محتواه بواقعية مذهلة!</div>
-                <button class="btn-3d" style="background:var(--accent-gold); color:#05070a; padding: 10px;" onclick="initRoyalGameSetup()">إعادة تعيين الشبكة 🔄</button>
+                <button class="btn-3d" style="background:var(--accent-gold); color:#05070a; padding: 10px;" onclick="resetGameSession('royal')">إعادة تهيئة الشبكة (Reset) 🔄</button>
             </div>
         </div>
     </div>
@@ -456,7 +479,10 @@
         <div class="header">
             <button class="back-btn" onclick="returnToLobby()">⬅ القائمة</button>
             <span>Wild West Gold ⛏️</span>
-            <div id="game-timer-hud-gold" class="timer-hud">⏱️ 10:00</div>
+            <div style="display: flex; gap: 6px;">
+                <div id="game-timer-hud-gold" class="timer-hud">⏱️ 10:00</div>
+                <div id="game-attempts-hud-gold" class="timer-hud" style="color: var(--accent-gold); background: rgba(255,204,0,0.1); border-color: var(--accent-gold);">🎮 3</div>
+            </div>
         </div>
         <div style="flex:1; display:flex; justify-content:center; align-items:center; background:rgba(18,12,8,0.6); padding: 10px;">
             <div class="mine-container">
@@ -492,7 +518,6 @@
     window.addEventListener('DOMContentLoaded', () => {
         let savedTheme = localStorage.getItem('user_theme_style') || 'theme-gold';
         document.body.className = savedTheme;
-        cleanupExpiredCodes();
         checkActiveSessionTimer();
     });
 
@@ -505,8 +530,13 @@
     }
 
     let sessionTimerInterval = null;
-    function startSessionTimer(expiresAt) {
+    let activeCodeKey = null;
+    let activeClientKey = null;
+    let currentActiveGame = null;
+
+    function startSessionTimer(expiresAt, code) {
         if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+        activeCodeKey = code;
         
         sessionTimerInterval = setInterval(() => {
             let leftSec = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
@@ -521,6 +551,11 @@
 
             if (leftSec <= 0) {
                 clearInterval(sessionTimerInterval);
+                let db = getStoredCodes();
+                if(db[activeCodeKey]) {
+                    db[activeCodeKey].status = "منتهي";
+                    saveStoredCodes(db);
+                }
                 alert("انتهت صلاحية جلسة الـ 10 دقائق الخاصة بك!");
                 location.reload();
             }
@@ -531,13 +566,46 @@
         let db = getStoredCodes();
         for (let code in db) {
             if (db[code].status === "active" && db[code].expiresAt > Date.now()) {
-                startSessionTimer(db[code].expiresAt);
+                startSessionTimer(db[code].expiresAt, code);
                 break;
             }
         }
     }
 
-    function runAISimulation(callback) {
+    function updateAttemptsHUD() {
+        let idsDb = getStoredIDs();
+        if (activeClientKey && idsDb[activeClientKey]) {
+            let attempts = idsDb[activeClientKey].attempts;
+            ['attempts-hud', 'game-attempts-hud-apple', 'game-attempts-hud-gems', 'game-attempts-hud-royal', 'game-attempts-hud-gold'].forEach(id => {
+                let el = document.getElementById(id);
+                if (el) el.innerText = `🎮 ${attempts}`;
+            });
+        }
+    }
+
+    function consumeAttemptForGame(gameName) {
+        if (!activeClientKey) return true;
+        if (currentActiveGame === gameName) return true;
+
+        let idsDb = getStoredIDs();
+        if (idsDb[activeClientKey]) {
+            if (idsDb[activeClientKey].attempts > 0) {
+                idsDb[activeClientKey].attempts -= 1;
+                saveStoredIDs(idsDb);
+                updateAttemptsHUD();
+                currentActiveGame = gameName;
+                return true;
+            } else {
+                alert("لقد استنفدت عدد المحاولات المتاحة لهذا الـ ID!");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function runAISimulation(gameName, callback) {
+        if (!consumeAttemptForGame(gameName)) return;
+        
         const overlay = document.getElementById('ai-sim-overlay');
         const text = document.getElementById('ai-sim-text');
         const bar = document.getElementById('ai-sim-bar');
@@ -577,40 +645,42 @@
         localStorage.setItem('dynamic_codes_db', JSON.stringify(db));
     }
 
-    function cleanupExpiredCodes() {
-        let db = getStoredCodes();
-        let now = Date.now();
-        let updated = {};
-        for (let code in db) {
-            let item = db[code];
-            if (item.expiresAt && now > item.expiresAt) continue;
-            updated[code] = item;
-        }
-        saveStoredCodes(updated);
-    }
-
     function generateCodeBatch() {
-        cleanupExpiredCodes();
         let db = getStoredCodes();
         let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         
         for (let i = 0; i < 15; i++) {
             let randomCode = "";
             for (let c = 0; c < 6; c++) {
-                randomCode += chars.charAt(Math.floor(Math.random() * chars.length));
+                let randomIndex = Math.floor(Math.random() * chars.length);
+                randomCode += chars.charAt(randomIndex);
             }
-            let formattedCode = "VIP3D-" + randomCode;
+            let formattedCode = "VIP3D-" + randomCode + Math.floor(Math.random() * 90 + 10);
+            
             if (!db[formattedCode]) {
                 db[formattedCode] = { status: "جاهز", expiresAt: null };
             }
         }
         saveStoredCodes(db);
         renderCodesTable();
-        alert("تم توليد دفعة جديدة من 15 كود 3D بنجاح! ✅");
+        alert("تم توليد دفعة جديدة من 15 كود 3D فريد كلياً بنجاح وتم حفظها في الذاكرة! ✅");
+    }
+
+    function copySingleCode(code) {
+        navigator.clipboard.writeText(code).then(() => {
+            alert(`تم نسخ الكود (${code}) بنجاح! 📋`);
+        }).catch(err => {
+            let textarea = document.createElement("textarea");
+            textarea.value = code;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textarea);
+            alert(`تم نسخ الكود (${code}) بنجاح! ✅`);
+        });
     }
 
     function copyAllCodes() {
-        cleanupExpiredCodes();
         let db = getStoredCodes();
         let codesList = Object.keys(db);
 
@@ -635,32 +705,36 @@
     }
 
     function renderCodesTable() {
-        cleanupExpiredCodes();
         let tbody = document.getElementById('codes-tbody');
         tbody.innerHTML = '';
         let db = getStoredCodes();
         let codesList = Object.keys(db);
 
         if (codesList.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#777;">لا توجد أكواد نشطة.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#777;">لا توجد أكواد مسجلة.</td></tr>`;
             return;
         }
 
         codesList.forEach(code => {
             let item = db[code];
-            let statusText = "جاهز (لم يُستخدم)";
+            let statusText = "جاهز (يعمل 10 دقائق عند أول استخدام)";
             if (item.status === "active") {
                 let leftSec = Math.max(0, Math.floor((item.expiresAt - Date.now()) / 1000));
                 let min = Math.floor(leftSec / 60);
                 let sec = leftSec % 60;
                 statusText = `نشط (${min}:${sec < 10 ? '0' : ''}${sec})`;
+            } else if (item.status === "منتهي") {
+                statusText = "منتهي الصلاحية";
             }
 
             let tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-family:monospace; font-weight:bold; color:var(--accent-gold);">${code}</td>
                 <td><span style="font-size:0.75rem;">${statusText}</span></td>
-                <td><button class="action-icon-btn" title="حذف" onclick="deleteSingleCode('${code}')">❌</button></td>
+                <td style="display: flex; gap: 4px; align-items: center; justify-content: flex-end;">
+                    <button class="action-icon-btn" title="نسخ الكود" onclick="copySingleCode('${code}')">📋</button>
+                    <button class="action-icon-btn" title="حذف" onclick="deleteSingleCode('${code}')">❌</button>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -683,15 +757,29 @@
 
     function addClientCustomID() {
         let idVal = document.getElementById('new-id-input').value.trim();
+        let attVal = parseInt(document.getElementById('new-id-attempts').value);
         if (idVal.length >= 2) {
             let idsDb = getStoredIDs();
-            idsDb[idVal] = { status: "مفعل نشط" };
+            idsDb[idVal] = { 
+                status: "مفعل نشط", 
+                attempts: idsDb[idVal] && idsDb[idVal].attempts !== undefined ? idsDb[idVal].attempts : attVal 
+            };
             saveStoredIDs(idsDb);
             document.getElementById('new-id-input').value = '';
             renderRomaIDsTable();
-            alert("تم إضافة وتفعيل الـ ID بنجاح! ✅");
+            alert(`تم حفظ وتفعيل الـ ID بنجاح في الذاكرة الدائمة! ✅`);
         } else {
             alert("يرجى كتابة ID صحيح!");
+        }
+    }
+
+    function updateIDAttempts(idKey, changeVal) {
+        let idsDb = getStoredIDs();
+        if (idsDb[idKey]) {
+            idsDb[idKey].attempts = Math.max(0, (idsDb[idKey].attempts || 0) + changeVal);
+            saveStoredIDs(idsDb);
+            renderRomaIDsTable();
+            if (activeClientKey === idKey) updateAttemptsHUD();
         }
     }
 
@@ -702,15 +790,20 @@
         let keys = Object.keys(idsDb);
 
         if (keys.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#777;">لا توجد IDs مفعلة.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#777;">لا توجد IDs مفعلة.</td></tr>`;
             return;
         }
 
         keys.forEach(idKey => {
+            let attemptsCount = idsDb[idKey].attempts !== undefined ? idsDb[idKey].attempts : 3;
             let tr = document.createElement('tr');
             tr.innerHTML = `
                 <td style="font-family:monospace; font-weight:bold; color:var(--win-green);">${idKey}</td>
-                <td><span style="font-size:0.75rem;">${idsDb[idKey].status}</span></td>
+                <td><span style="font-size:0.75rem; color:var(--accent-gold);">${attemptsCount}</span></td>
+                <td style="display: flex; gap: 4px; align-items: center;">
+                    <button class="action-icon-btn" style="color:var(--win-green); font-weight:bold;" onclick="updateIDAttempts('${idKey}', 1)" title="زيادة محاولة">+1</button>
+                    <button class="action-icon-btn" style="color:var(--bomb-red); font-weight:bold;" onclick="updateIDAttempts('${idKey}', -1)" title="نقصان محاولة">-1</button>
+                </td>
                 <td><button class="action-icon-btn" title="حذف" onclick="deleteSingleID('${idKey}')">❌</button></td>
             `;
             tbody.appendChild(tr);
@@ -724,7 +817,7 @@
         renderRomaIDsTable();
     }
 
-    async function checkPass() {
+    function checkPass() {
         let enteredPass = document.getElementById('pass-input').value.trim();
 
         if (enteredPass === "HendFtw00") {
@@ -743,26 +836,29 @@
             return;
         }
 
-        cleanupExpiredCodes();
         let db = getStoredCodes();
         if (db[enteredPass]) {
             let item = db[enteredPass];
             let now = Date.now();
             
-            if (item.status === "جاهز") {
+            // إذا كان الكود جديداً ولم يتم تفعيله بعد، نبدأ الـ 10 دقائق الآن
+            if (!item.expiresAt || item.status === "جاهز") {
                 item.status = "active";
                 item.expiresAt = now + (10 * 60 * 1000);
                 saveStoredCodes(db);
             }
 
-            if (item.expiresAt && now <= item.expiresAt) {
-                startSessionTimer(item.expiresAt);
+            // السماح بإعادة استخدام الكود طالما أن الوقت لم ينته بعد
+            if (now <= item.expiresAt) {
+                startSessionTimer(item.expiresAt, enteredPass);
                 document.getElementById('pass-screen').style.display = 'none';
                 document.getElementById('id-screen').style.display = 'flex';
                 document.getElementById('pass-input').value = '';
                 return;
             } else {
-                alert("عذراً، هذا الكود انتهت صلاحيته!");
+                item.status = "منتهي";
+                saveStoredCodes(db);
+                alert("عذراً، انتهت صلاحية هذا الكود (مرت 10 دقائق)!");
                 document.getElementById('pass-input').value = '';
                 return;
             }
@@ -784,11 +880,19 @@
 
     function checkID() { 
         let idVal = document.getElementById('id-input').value.trim();
-        if (idVal.length >= 3) { 
+        let idsDb = getStoredIDs();
+        
+        if (idVal.length >= 2 && idsDb[idVal]) { 
+            activeClientKey = idVal;
+            if (idsDb[idVal].attempts === undefined) {
+                idsDb[idVal].attempts = 3;
+                saveStoredIDs(idsDb);
+            }
+            updateAttemptsHUD();
             document.getElementById('id-screen').style.display = 'none'; 
             startServerConnection(); 
         } else { 
-            alert("يرجى إدخال الـ ID بشكل صحيح!"); 
+            alert("يرجى إدخال ID صحيح ومفعل من قبل الإدارة ومحفوظ في الذاكرة!"); 
         } 
     }
 
@@ -876,8 +980,17 @@
     }
 
     function returnToLobby() {
+        currentActiveGame = null;
         document.getElementById('main-container').style.display = 'none';
         document.getElementById('lobby-screen').style.display = 'flex';
+        updateAttemptsHUD();
+    }
+
+    function resetGameSession(gameName) {
+        currentActiveGame = null;
+        if(gameName === 'apple') startGameAppleSetup();
+        else if(gameName === 'gems') renderGemsGridSetup();
+        else if(gameName === 'royal') initRoyalGameSetup();
     }
 
     let curAppleRow = 0;
@@ -920,7 +1033,7 @@
             revealBtn.className = 'row-reveal-btn';
             revealBtn.innerText = `🔍 كشف الصف (${i + 1})`;
             revealBtn.onclick = () => {
-                runAISimulation(() => revealAppleRow(i));
+                runAISimulation('apple', () => revealAppleRow(i));
             };
             wrapper.appendChild(revealBtn);
             board.appendChild(wrapper);
@@ -970,7 +1083,7 @@
             cell.className = 'cell-gem';
             cell.innerText = '❓';
             cell.onclick = () => {
-                runAISimulation(() => revealGemsCell(cell, i));
+                runAISimulation('gems', () => revealGemsCell(cell, i));
             };
             board.appendChild(cell);
         }
@@ -1010,7 +1123,7 @@
             cell.className = 'cell-royal';
             cell.innerText = '❓';
             cell.onclick = () => {
-                runAISimulation(() => revealRoyalCell(cell, i));
+                runAISimulation('royal', () => revealRoyalCell(cell, i));
             };
             board.appendChild(cell);
         }
@@ -1067,7 +1180,7 @@
                 box.className = `mine-box ${i === mineCurrentStep ? 'active' : ''}`;
                 box.innerText = i === mineCurrentStep ? "🔍 اكشف" : "🔒 مغلق";
                 box.onclick = () => {
-                    runAISimulation(() => revealMineStep(i));
+                    runAISimulation('goldmine', () => revealMineStep(i));
                 };
                 row.appendChild(box);
             }
@@ -1082,8 +1195,6 @@
         const correctIndex = mineWinningPaths[step];
         const row = document.getElementById(`row-${step}`);
         const boxes = row.children;
-
-        for (let j = 0; j < boxes.codes; j++) {} // placeholder safety
 
         for (let j = 0; j < boxes.length; j++) {
             boxes[j].onclick = null;
@@ -1115,7 +1226,7 @@
                     box.className = "mine-box active";
                     box.innerText = "🔍 اكشف";
                     box.onclick = () => {
-                        runAISimulation(() => revealMineStep(mineCurrentStep));
+                        runAISimulation('goldmine', () => revealMineStep(mineCurrentStep));
                     };
                 }
             }
@@ -1123,6 +1234,7 @@
     }
 
     function resetToMineMenu() {
+        currentActiveGame = null;
         document.getElementById('mineGameArea').style.display = 'none';
         document.getElementById('mineMainMenu').style.display = 'block';
     }

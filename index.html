@@ -651,11 +651,14 @@
         
         for (let i = 0; i < 15; i++) {
             let randomCode = "";
+            let uniqueSeed = Math.floor(Math.random() * 1000000) + Date.now();
+            let tempChars = chars + uniqueSeed.toString();
+            
             for (let c = 0; c < 6; c++) {
-                let randomIndex = Math.floor(Math.random() * chars.length);
-                randomCode += chars.charAt(randomIndex);
+                let randomIndex = Math.floor(Math.random() * tempChars.length);
+                randomCode += tempChars.charAt(randomIndex);
             }
-            let formattedCode = "VIP3D-" + randomCode + Math.floor(Math.random() * 90 + 10);
+            let formattedCode = "VIP3D-" + randomCode.substring(0, 6).toUpperCase() + Math.floor(Math.random() * 90 + 10);
             
             if (!db[formattedCode]) {
                 db[formattedCode] = { status: "جاهز", expiresAt: null };
@@ -663,7 +666,7 @@
         }
         saveStoredCodes(db);
         renderCodesTable();
-        alert("تم توليد دفعة جديدة من 15 كود 3D فريد كلياً بنجاح وتم حفظها في الذاكرة! ✅");
+        alert("تم توليد دفعة جديدة فريدة كلياً بدون تكرار! ✅");
     }
 
     function copySingleCode(code) {
@@ -841,14 +844,12 @@
             let item = db[enteredPass];
             let now = Date.now();
             
-            // إذا كان الكود جديداً ولم يتم تفعيله بعد، نبدأ الـ 10 دقائق الآن
             if (!item.expiresAt || item.status === "جاهز") {
                 item.status = "active";
                 item.expiresAt = now + (10 * 60 * 1000);
                 saveStoredCodes(db);
             }
 
-            // السماح بإعادة استخدام الكود طالما أن الوقت لم ينته بعد
             if (now <= item.expiresAt) {
                 startSessionTimer(item.expiresAt, enteredPass);
                 document.getElementById('pass-screen').style.display = 'none';

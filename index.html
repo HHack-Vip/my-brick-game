@@ -302,7 +302,7 @@
         </div>
 
         <div style="margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px; text-align: right;">
-            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">الأكواد النشطة (تستمر 10 دقائق من أول استخدام):</span>
+            <span style="font-size: 0.75rem; color: var(--accent-gold); font-weight: bold;">الأكواد (تبدأ الـ 10 دقائق عند الدخول لأول مرة):</span>
             <div style="max-height: 180px; overflow-y: auto; margin-top: 6px;">
                 <table class="id-manage-table" id="codes-table">
                     <thead>
@@ -720,7 +720,7 @@
 
         codesList.forEach(code => {
             let item = db[code];
-            let statusText = "جاهز (يعمل 10 دقائق عند أول استخدام)";
+            let statusText = "جاهز (يبدأ العداد عند الاستخدام)";
             if (item.status === "active") {
                 let leftSec = Math.max(0, Math.floor((item.expiresAt - Date.now()) / 1000));
                 let min = Math.floor(leftSec / 60);
@@ -844,7 +844,8 @@
             let item = db[enteredPass];
             let now = Date.now();
             
-            if (!item.expiresAt || item.status === "جاهز") {
+            // التعديل الجديد: العداد لا يبدأ إلا عند إدخال الكود والضغط على دخول لأول مرة
+            if (item.status === "جاهز" || !item.expiresAt) {
                 item.status = "active";
                 item.expiresAt = now + (10 * 60 * 1000);
                 saveStoredCodes(db);
@@ -859,7 +860,7 @@
             } else {
                 item.status = "منتهي";
                 saveStoredCodes(db);
-                alert("عذراً، انتهت صلاحية هذا الكود (مرت 10 دقائق)!");
+                alert("عذراً، انتهت صلاحية هذا الكود (مرت 10 دقائق من لحظة استخدامه)!");
                 document.getElementById('pass-input').value = '';
                 return;
             }
